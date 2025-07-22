@@ -7,8 +7,9 @@ import com.craftmend.openaudiomc.generic.mojang.MojangLookupService;
 import com.craftmend.openaudiomc.generic.mojang.store.MojangProfile;
 import com.craftmend.openaudiomc.generic.rest.Task;
 import com.craftmend.openaudiomc.generic.platform.OaColor;
-import com.craftmend.openaudiomc.generic.platform.interfaces.TaskService;
 import com.craftmend.openaudiomc.api.user.User;
+import com.craftmend.openaudiomc.spigot.OpenAudioMcSpigot;
+import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
 import java.util.UUID;
@@ -56,9 +57,9 @@ public class VoiceInspectSubCommand extends SubCommand {
 
     public void handleInspect(User sender, String[] args, ClientDataStore target, UUID targetId, String targetName) {
         message(sender, OaColor.GREEN + "Opening profile");
-        resolveDependency(TaskService.class).runSync(() -> {
+        Bukkit.getPlayer(sender.getUniqueId()).getScheduler().run(OpenAudioMcSpigot.getInstance(), task -> {
             new VoiceInspectGui((Player) sender.getOriginal(), target, targetId, targetName);
-        });
+        }, null);
     }
 
 }

@@ -7,7 +7,6 @@ import com.craftmend.openaudiomc.generic.client.objects.ClientConnection;
 import com.craftmend.openaudiomc.generic.networking.interfaces.NetworkingService;
 import com.craftmend.openaudiomc.generic.networking.packets.client.speakers.PacketClientUpdateLocation;
 import com.craftmend.openaudiomc.generic.networking.payloads.client.speakers.ClientPlayerLocationPayload;
-import com.craftmend.openaudiomc.generic.platform.interfaces.TaskService;
 import com.craftmend.openaudiomc.spigot.OpenAudioMcSpigot;
 import com.craftmend.openaudiomc.spigot.modules.players.enums.PlayerLocationFollower;
 import com.craftmend.openaudiomc.spigot.modules.players.events.ClientDisconnectEvent;
@@ -108,16 +107,18 @@ public class SpigotConnection {
 
             if (player.isOnline()) {
                 locationDataWatcher.getCallback().accept(player.getLocation());
-                Bukkit.getScheduler().runTask(OpenAudioMcSpigot.getInstance(), () -> Bukkit.getServer().getPluginManager().callEvent(new ClientConnectEvent(player, this)));
+                player.getScheduler().run(OpenAudioMcSpigot.getInstance(), task -> {
+                    Bukkit.getServer().getPluginManager().callEvent(new ClientConnectEvent(player, this));
+                }, null);
             }
         });
 
         clientConnection.addOnConnectHandler(new InitializeTrains(player));
 
         clientConnection.addOnDisconnectHandler(() -> {
-            OpenAudioMc.resolveDependency(TaskService.class).runSync(() -> {
+            player.getScheduler().run(OpenAudioMcSpigot.getInstance(), scheduledTask -> {
                 Bukkit.getServer().getPluginManager().callEvent(new ClientDisconnectEvent(player));
-            });
+            }, null);
 
             OpenAudioMc.getService(VoiceChannelService.class).handleUserDisconnect(clientConnection);
         });

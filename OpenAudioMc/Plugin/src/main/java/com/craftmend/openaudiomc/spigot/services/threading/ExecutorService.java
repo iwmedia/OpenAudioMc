@@ -35,8 +35,8 @@ public class ExecutorService extends Service {
     public void onEnable() {
         boot();
 
-        Bukkit.getScheduler().scheduleSyncRepeatingTask(plugin, executor::tickSync, 1, 1);
-        Bukkit.getScheduler().scheduleSyncRepeatingTask(plugin, () -> {
+        Bukkit.getGlobalRegionScheduler().runAtFixedRate(this.plugin, task -> this.executor.tickSync(), 1, 1);
+        Bukkit.getGlobalRegionScheduler().runAtFixedRate(this.plugin, task -> {
             if (Duration.between(lastPing, Instant.now()).toMillis() > 10000) {
                 executor.stop();
                 executor = null;

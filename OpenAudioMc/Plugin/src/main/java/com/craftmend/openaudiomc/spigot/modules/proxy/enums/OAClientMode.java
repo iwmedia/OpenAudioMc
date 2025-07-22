@@ -11,7 +11,9 @@ public enum OAClientMode {
     NODE(ProxyNetworkingService.class),
     ;
 
-    @Getter private final Class<? extends NetworkingService> serviceClass;
+    @Getter
+    private final Class<? extends NetworkingService> serviceClass;
+
     OAClientMode(Class<? extends NetworkingService> networkingServiceClass) {
         this.serviceClass = networkingServiceClass;
     }

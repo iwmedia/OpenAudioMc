@@ -1,9 +1,7 @@
 plugins {
     id 'java-library'
     id 'maven-publish'
-    id("io.freefair.lombok") version "8.13.1"
-    id 'dev.s7a.gradle.minecraft.server' version '3.2.1'
-    id 'com.github.johnrengelman.shadow' version '8.1.1'
+    id("com.gradleup.shadow") version "9.0.0-rc1"
 }
 
 description = 'OpenAudioMc Plugin'
@@ -11,7 +9,11 @@ description = 'OpenAudioMc Plugin'
 dependencies {
     // Core dependencies (these will be shaded)
     implementation deps.nbtApi
-    implementation deps.storm
+    implementation(deps.storm) {
+        exclude group: 'org.projectlombok', module: 'lombok-maven'
+        exclude group: 'org.spigotmc', module: 'spigot-api'
+    }
+
     implementation 'org.yaml:snakeyaml:2.0'
     implementation(deps.okhttp) {
         exclude group: 'com.google.android', module: 'android'
@@ -29,7 +31,7 @@ dependencies {
     implementation project(':OpenAudioMc:OA-WorldGuardModern')
 
     // Provided dependencies (these will NOT be shaded)
-    compileOnly deps.spigot
+    compileOnly deps.folia
     compileOnly deps.bungeeProxy
     compileOnly deps.bungeeProtocol
     compileOnly deps.bungeeApi
@@ -39,6 +41,9 @@ dependencies {
     compileOnly deps.litebans
     compileOnly deps.essentialsx
     compileOnly deps.placeholderapi
+
+    compileOnly deps.lombok.compileOnly
+    annotationProcessor deps.lombok.annotationProcessor
 
     // Test dependencies
     testImplementation 'com.coreoz:wisp:2.4.0'
@@ -59,9 +64,8 @@ shadowJar {
     relocate 'de.tr7zw.changeme.nbtapi', 'com.craftmend.thirdparty.nbt'
     relocate 'io', 'com.craftmend.thirdparty.io', {
         // Exclude netty classes to not break invocations with bungee
-        exclude 'io.netty.channel.Channel'
-        exclude 'io.netty.channel.ChannelPipeline'
-        exclude 'io.netty.channel.ChannelHandler'
+        exclude 'io.papermc.**'
+        exclude 'io.netty.**'
     }
     relocate 'org.json', 'com.craftmend.thirdparty.json'
     relocate 'reactor', 'com.craftmend.thirdparty.reactor'
@@ -72,27 +76,23 @@ shadowJar {
     relocate 'kotlin', 'com.craftmend.thirdparty.kotlin'
 
     // Exclude duplicate files and signing files
-    exclude 'META-INF/*.SF'
-    exclude 'META-INF/*.DSA'
-    exclude 'META-INF/*.RSA'
-    exclude 'META-INF/DEPENDENCIES'
-    exclude 'META-INF/LICENSE*'
-    exclude 'META-INF/NOTICE*'
+    exclude 'META-INF/*'
+    exclude 'META-INF'
 
     // Merge service files instead of excluding them
     mergeServiceFiles()
 
-    // Transform to handle duplicate entries
-    transform(com.github.jengelman.gradle.plugins.shadow.transformers.AppendingTransformer) {
-        resource = 'META-INF/spring.handlers'
-    }
-    transform(com.github.jengelman.gradle.plugins.shadow.transformers.AppendingTransformer) {
-        resource = 'META-INF/spring.schemas'
-    }
+//    // Transform to handle duplicate entries
+//    transform(com.github.jengelman.gradle.plugins.shadow.transformers.AppendingTransformer) {
+//        resource = 'META-INF/spring.handlers'
+//    }
+//    transform(com.github.jengelman.gradle.plugins.shadow.transformers.AppendingTransformer) {
+//        resource = 'META-INF/spring.schemas'
+//    }
 }
 
 // Make javadoc ignore errors
-tasks.withType(Javadoc) {
+tasks.withType(Javadoc).configureEach {
     options.addStringOption('Xdoclint:none', '-quiet')
     options.encoding = 'UTF-8'
 }
@@ -117,80 +117,45 @@ build {
     dependsOn shadowJar
 }
 
+// TODO: 22.07.2025 14:19 - tjorven:
 // Configure publishing to use the shadow jar
-publishing {
-    publications {
-        maven(MavenPublication) {
-            // Use the shadow jar as the main artifact
-            artifact shadowJar
-            artifact sourcesJar
-            artifact javadocJar
-
-            groupId = project.group
-            artifactId = 'openaudiomc'
-            version = project.version
-
-            // Configure the POM
-            pom {
-                name = 'OpenAudioMc'
-                description = 'The OpenAudioMc Java plugin and Api'
-                url = 'https://openaudiomc.net/'
-            }
-        }
-    }
-
-    repositories {
-        maven {
-            name = 'github'
-            url = uri('https://maven.pkg.github.com/Mindgamesnl/OpenAudioMc')
-            credentials {
-                username = System.getenv('GITHUB_ACTOR')
-                password = System.getenv('GITHUB_TOKEN')
-            }
-        }
-    }
-}
-
-import dev.s7a.gradle.minecraft.server.tasks.LaunchMinecraftServerTask
-
-[
-        ["8", "1.8.8"],
-        ["12", "1.12.2"],
-        ["20", "1.20.4"],
-        ["21", "1.21.4"],
-        ["217", "1.21.7"]
-].each { name, version ->
-    task("testPlugin$name", type: LaunchMinecraftServerTask) {
-        dependsOn 'shadowJar' // Changed from 'build' to use the shaded jar
-        doFirst {
-            copy {
-                from shadowJar.archiveFile
-                into "$buildDir/MinecraftServer$name/plugins"
-            }
-        }
-        serverDirectory = "$buildDir/MinecraftServer$name"
-        jarUrl = LaunchMinecraftServerTask.JarUrl.INSTANCE.Paper(version)
-        agreeEula = true
-    }
-}
-
-task("testPluginBungee", type: LaunchMinecraftServerTask) {
-    dependsOn 'shadowJar'
-    doFirst {
-        copy {
-            from shadowJar.archiveFile
-            into "$buildDir/BungeeServer/plugins"
-        }
-    }
-    serverDirectory = "$buildDir/BungeeServer"
-    jarUrl = "https://ci.md-5.net/job/BungeeCord/lastSuccessfulBuild/artifact/bootstrap/target/BungeeCord.jar"
-    agreeEula = true
-}
+//publishing {
+//    publications {
+//        maven(MavenPublication) {
+//            // Use the shadow jar as the main artifact
+//            artifact shadowJar
+//            artifact sourcesJar
+//            artifact javadocJar
+//
+//            groupId = project.group
+//            artifactId = 'openaudiomc'
+//            version = project.version
+//
+//            // Configure the POM
+//            pom {
+//                name = 'OpenAudioMc'
+//                description = 'The OpenAudioMc Java plugin and Api'
+//                url = 'https://openaudiomc.net/'
+//            }
+//        }
+//    }
+//
+//    repositories {
+//        maven {
+//            name = 'github'
+//            url = uri('https://maven.pkg.github.com/Mindgamesnl/OpenAudioMc')
+//            credentials {
+//                username = System.getenv('GITHUB_ACTOR')
+//                password = System.getenv('GITHUB_TOKEN')
+//            }
+//        }
+//    }
+//}
 
 def placeholder = "@OA_VERSION@"
 def versionValue = project.version.toString()
 
-task replaceVersionPlaceholders {
+tasks.register('replaceVersionPlaceholders') {
     description = 'Replaces @OA_VERSION@ in all source and resource files with the project version.'
     group = 'build'
 

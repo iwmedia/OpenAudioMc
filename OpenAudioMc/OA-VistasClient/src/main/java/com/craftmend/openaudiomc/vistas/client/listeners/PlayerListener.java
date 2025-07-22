@@ -10,19 +10,22 @@ import com.craftmend.openaudiomc.vistas.client.Vistas;
 import com.craftmend.openaudiomc.vistas.client.client.VistasRedisClient;
 import com.craftmend.openaudiomc.vistas.client.redis.packets.UserJoinPacket;
 import com.craftmend.openaudiomc.vistas.client.redis.packets.UserLeavePacket;
+import io.papermc.paper.threadedregions.scheduler.ScheduledTask;
 import org.bukkit.Bukkit;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.TimeUnit;
 
 public class PlayerListener implements Listener {
 
-    private Map<UUID, Integer> joinCancels = new ConcurrentHashMap<>();
+    private Map<UUID, ScheduledTask> joinCancels = new ConcurrentHashMap<>();
     private Vistas module;
 
     public PlayerListener(Vistas plugin) {
@@ -32,7 +35,7 @@ public class PlayerListener implements Listener {
     @EventHandler
     public void onPlayerJoin(PlayerJoinEvent event) {
         // delay one second to prevent fuckery lol
-        int task = OpenAudioMcSpigot.getInstance().getServer().getScheduler().runTaskLaterAsynchronously(OpenAudioMcSpigot.getInstance(), () -> {
+        @NotNull ScheduledTask task = Bukkit.getAsyncScheduler().runDelayed(OpenAudioMcSpigot.getInstance(), scheduledTask -> {
             // get user for this player
             User user = OpenAudioMc.resolveDependency(UserHooks.class).byUuid(event.getPlayer().getUniqueId());
 
@@ -50,14 +53,14 @@ public class PlayerListener implements Listener {
                     )
             );
             joinCancels.remove(event.getPlayer().getUniqueId());
-        }, 40).getTaskId(); // 2 seconds
+        }, 40 * 50, TimeUnit.MILLISECONDS); // 2 seconds
         joinCancels.put(event.getPlayer().getUniqueId(), task);
     }
 
     @EventHandler
     public void onPlayerQuit(PlayerQuitEvent event) {
         if (joinCancels.containsKey(event.getPlayer().getUniqueId())) {
-            Bukkit.getScheduler().cancelTask(joinCancels.get(event.getPlayer().getUniqueId()));
+            joinCancels.get(event.getPlayer().getUniqueId()).cancel();
             joinCancels.remove(event.getPlayer().getUniqueId());
         }
 

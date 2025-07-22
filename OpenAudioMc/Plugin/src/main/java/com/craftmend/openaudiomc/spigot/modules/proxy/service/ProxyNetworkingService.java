@@ -17,9 +17,11 @@ import com.craftmend.openaudiomc.spigot.modules.proxy.listeners.BukkitPacketList
 
 import com.craftmend.openaudiomc.generic.proxy.messages.implementations.BukkitPacketManager;
 import lombok.Getter;
+import org.bukkit.Bukkit;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
+import java.util.concurrent.TimeUnit;
 
 public class ProxyNetworkingService extends NetworkingService {
 
@@ -40,9 +42,9 @@ public class ProxyNetworkingService extends NetworkingService {
         packetManager.registerListener(new BukkitPacketListener());
 
         // schedule repeating task to clear the throughput
-        OpenAudioMc.resolveDependency(TaskService.class).scheduleAsyncRepeatingTask(() -> {
+        Bukkit.getAsyncScheduler().runAtFixedRate(OpenAudioMcSpigot.getInstance(), task -> {
             packetThroughput = 0;
-        }, 20, 20);
+        }, 20 * 50, 20 * 50, TimeUnit.MILLISECONDS);
     }
 
     @Override
