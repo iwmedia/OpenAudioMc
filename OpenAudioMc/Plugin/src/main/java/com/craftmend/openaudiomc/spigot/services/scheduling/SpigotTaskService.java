@@ -9,10 +9,12 @@ import org.bukkit.Bukkit;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
-import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class SpigotTaskService implements TaskService {
+
+    private final AtomicInteger taskIdCounter = new AtomicInteger(0);
 
     private final ConcurrentMap<Integer, ScheduledTask> tasks = new ConcurrentHashMap<>();
 
@@ -80,9 +82,9 @@ public class SpigotTaskService implements TaskService {
     }
 
     private int putTask(ScheduledTask task) {
-        int randomId = ThreadLocalRandom.current().nextInt(Integer.MAX_VALUE);
-        this.tasks.put(randomId, task);
-        return randomId;
+        int taskId = this.taskIdCounter.getAndIncrement();
+        this.tasks.put(taskId, task);
+        return taskId;
     }
 
     private Optional<ScheduledTask> getTask(int id) {
