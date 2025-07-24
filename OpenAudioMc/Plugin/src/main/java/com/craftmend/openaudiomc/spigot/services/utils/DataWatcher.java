@@ -1,16 +1,19 @@
 package com.craftmend.openaudiomc.spigot.services.utils;
 
 import com.craftmend.openaudiomc.spigot.services.utils.interfaces.Feeder;
+import io.papermc.paper.threadedregions.scheduler.ScheduledTask;
 import lombok.Getter;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.jetbrains.annotations.NotNull;
 
+import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 
 public class DataWatcher<T> {
 
     private T value;
-    private final int task;
+    private final @NotNull ScheduledTask task;
     private Feeder<T> dataFeeder;
     @Getter private Consumer<T> callback;
     private boolean isRunning;
@@ -26,9 +29,9 @@ public class DataWatcher<T> {
         };
 
         if (sync) {
-            this.task = Bukkit.getScheduler().scheduleSyncRepeatingTask(plugin, executor, delayTicks, delayTicks);
+            this.task = Bukkit.getGlobalRegionScheduler().runAtFixedRate(plugin, scheduledTask -> executor.run(), delayTicks, delayTicks);
         } else {
-            this.task = Bukkit.getScheduler().scheduleAsyncRepeatingTask(plugin, executor, delayTicks, delayTicks);
+            this.task = Bukkit.getAsyncScheduler().runAtFixedRate(plugin, scheduledTask -> executor.run(), delayTicks * 50L, delayTicks * 50L, TimeUnit.MILLISECONDS);
         }
 
         isRunning = true;
@@ -53,7 +56,7 @@ public class DataWatcher<T> {
     }
 
     public void stop() {
-        Bukkit.getScheduler().cancelTask(this.task);
+        this.task.cancel();
         this.isRunning = false;
     }
 

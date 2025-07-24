@@ -1,14 +1,16 @@
 plugins {
     id 'java-library'
     id 'maven-publish'
-    id("io.freefair.lombok") version "8.13.1"
 }
 
 description = 'OpenAudioMc API'
 
 dependencies {
-    compileOnly deps.spigot
+    compileOnly deps.folia
     compileOnly deps.jetbrainsAnnot
+
+    compileOnly deps.lombok.compileOnly
+    annotationProcessor deps.lombok.annotationProcessor
 }
 
 java {
@@ -18,7 +20,7 @@ java {
 
 javadoc {
     options {
-        source = '8'
+        source = '21'
         encoding = 'UTF-8'
         charSet = 'UTF-8'
         docEncoding = 'UTF-8'

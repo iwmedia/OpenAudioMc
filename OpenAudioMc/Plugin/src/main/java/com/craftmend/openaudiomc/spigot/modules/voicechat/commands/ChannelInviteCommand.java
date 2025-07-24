@@ -1,6 +1,7 @@
 package com.craftmend.openaudiomc.spigot.modules.voicechat.commands;
 
 import com.craftmend.openaudiomc.api.clients.Client;
+import com.craftmend.openaudiomc.api.user.User;
 import com.craftmend.openaudiomc.generic.client.objects.ClientConnection;
 import com.craftmend.openaudiomc.generic.commands.interfaces.SubCommand;
 import com.craftmend.openaudiomc.generic.commands.objects.Argument;
@@ -8,7 +9,6 @@ import com.craftmend.openaudiomc.generic.commands.objects.CommandError;
 import com.craftmend.openaudiomc.generic.platform.Platform;
 import com.craftmend.openaudiomc.generic.proxy.interfaces.UserHooks;
 import com.craftmend.openaudiomc.generic.storage.enums.StorageKey;
-import com.craftmend.openaudiomc.api.user.User;
 import com.craftmend.openaudiomc.spigot.OpenAudioMcSpigot;
 import com.craftmend.openaudiomc.spigot.modules.voicechat.VoiceChannelService;
 import com.craftmend.openaudiomc.spigot.modules.voicechat.channels.Channel;
@@ -151,7 +151,7 @@ public class ChannelInviteCommand extends SubCommand {
                         .replace("{player}", target.getName())
         ));
 
-        Bukkit.getScheduler().runTaskLater(OpenAudioMcSpigot.getInstance(), () -> {
+        Bukkit.getPlayer(sender.getUniqueId()).getScheduler().runDelayed(OpenAudioMcSpigot.getInstance(), task -> {
             if (invitations.containsKey(invitationId)) {
                 invitations.remove(invitationId);
                 sender.sendMessage(Platform.translateColors(
@@ -159,6 +159,6 @@ public class ChannelInviteCommand extends SubCommand {
                                 .replace("{player}", target.getName())
                 ));
             }
-        }, 20 * 30);
+        }, null, 20 * 30);
     }
 }

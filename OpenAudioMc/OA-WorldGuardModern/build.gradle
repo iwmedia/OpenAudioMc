@@ -14,7 +14,7 @@ repositories {
 
 dependencies {
     compileOnly project(':OpenAudioMc:OA-WorldguardIntegration')
-    compileOnly deps.spigot
+    compileOnly deps.folia
 
     // https://mvnrepository.com/artifact/com.sk89q.worldguard/worldguard-bukkit
     compileOnly("com.sk89q.worldguard:worldguard-bukkit:7.0.0") {

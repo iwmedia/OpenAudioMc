@@ -16,7 +16,7 @@ public class PlayerTeleportationListener implements Listener {
     public void onTp(PlayerTeleportEvent event) {
 
         // run a tick later, to run post teleport if the player actually moved
-        Bukkit.getScheduler().runTaskLater(OpenAudioMcSpigot.getInstance(), () -> {
+        event.getPlayer().getScheduler().runDelayed(OpenAudioMcSpigot.getInstance(), task -> {
             if (event.isCancelled()) return;
 
             // this event might be called before the player is registered, as some plugins use
@@ -29,7 +29,7 @@ public class PlayerTeleportationListener implements Listener {
                 spigotConnection.getRegionHandler().tick();
             }
             spigotConnection.getSpeakerHandler().tick();
-        }, 1);
+        }, null, 1);
     }
 
 }

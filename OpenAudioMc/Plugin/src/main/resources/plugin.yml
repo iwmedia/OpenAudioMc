@@ -2,8 +2,9 @@ name: OpenAudioMc
 version: 6.10.13
 softdepend: [WorldGuard, Train_Carts, LiteBans, Essentials, PlaceholderAPI]
 main: com.craftmend.openaudiomc.spigot.OpenAudioMcSpigot
-api-version: 1.13
-authors: [Mindgamesnl, ToetMats]
+api-version: 1.21
+folia-supported: true
+authors: [Mindgamesnl, ToetMats, Interwebmedia GmbH]
 description: "OpenAudioMc: Proximity voice chat & audio plugin for Minecraft, no mods needed. Supports Bungeecord, Velocity, Spigot & more."
 website: https://openaudiomc.net/
 commands:

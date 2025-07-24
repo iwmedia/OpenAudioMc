@@ -90,7 +90,7 @@ public class BukkitPacketListener implements PacketListener {
     public void onCommand(User user, CommandProxyPacket packet) {
         User<?> player = OpenAudioMc.resolveDependency(UserHooks.class).byUuid(packet.getCommandProxy().getExecutor());
         if (player == null) return;
-        Bukkit.getScheduler().runTask(OpenAudioMcSpigot.getInstance(), () -> {
+        Bukkit.getPlayer(user.getUniqueId()).getScheduler().run(OpenAudioMcSpigot.getInstance(), task -> {
             try {
                 OpenAudioMc.getService(CommandService.class)
                         .getSubCommand(CommandContext.OPENAUDIOMC, packet.getCommandProxy().getProxiedCommand().toString().toLowerCase())
@@ -103,7 +103,7 @@ public class BukkitPacketListener implements PacketListener {
                     OpenAudioLogger.error(e, "failed to execute from proxy packet");
                 }
             }
-        });
+        }, null);
     }
 
     @ProxyPacketHandler

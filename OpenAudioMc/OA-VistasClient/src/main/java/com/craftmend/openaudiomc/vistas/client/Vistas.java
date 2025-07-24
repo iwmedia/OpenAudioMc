@@ -80,7 +80,9 @@ public final class Vistas extends ExternalModule implements Listener {
             s.getServer().getPluginManager().registerEvents(new PlayerListener(this), s);
 
             // register self after a bit
-            Bukkit.getScheduler().runTaskLater(OpenAudioMcSpigot.getInstance(), this::registerSelf, 80); // 4 seconds
+            Bukkit.getGlobalRegionScheduler().runDelayed(OpenAudioMcSpigot.getInstance(), scheduledTask -> {
+                this.registerSelf();
+            }, 80); // 4 seconds
         }
 
         if (event == ModuleEvent.SHUTDOWN) {

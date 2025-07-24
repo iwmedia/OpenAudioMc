@@ -137,7 +137,7 @@ public class RegionEditSubCommand extends ParameteredSubCommand {
         // ignore temp
         if (rp instanceof TimedRegionProperties) return;
 
-        Bukkit.getScheduler().runTaskAsynchronously(OpenAudioMcSpigot.getInstance(), () -> {
+        Bukkit.getAsyncScheduler().runNow(OpenAudioMcSpigot.getInstance(), task -> {
             OpenAudioMc.getService(DatabaseService.class).getRepository(RegionProperties.class).save(rp);
         });
     }

@@ -8,13 +8,18 @@ import com.craftmend.openaudiomc.spigot.modules.players.SpigotPlayerService;
 import com.craftmend.openaudiomc.spigot.modules.regions.registry.WorldRegionManager;
 import com.craftmend.storm.api.markers.Column;
 import com.craftmend.storm.api.markers.Table;
+import io.papermc.paper.threadedregions.scheduler.ScheduledTask;
 import org.bukkit.Bukkit;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
+import java.util.concurrent.TimeUnit;
 
 
 @Table(name = "timed_region_properties")
 public class TimedRegionProperties extends RegionProperties {
 
-    private int task = -1;
+    private @Nullable ScheduledTask task;
     @Column
     private String regionId;
     private Media media;
@@ -32,13 +37,13 @@ public class TimedRegionProperties extends RegionProperties {
         this.regionId = regionId;
 
         if (OpenAudioMc.getInstance().getPlatform() == Platform.SPIGOT) {
-            this.task = Bukkit.getScheduler().scheduleAsyncDelayedTask(OpenAudioMcSpigot.getInstance(), () -> {
+            this.task = Bukkit.getAsyncScheduler().runDelayed(OpenAudioMcSpigot.getInstance(), task -> {
 
                 // remove myself from all my worlds
                 for (String world : getWorlds()) {
                     OpenAudioMcSpigot.getInstance().getRegionModule().getWorld(world).unregisterRegion(this.regionId);
                 }
-            }, 20 * timeInSeconds);
+            }, 20L * timeInSeconds / 1000, TimeUnit.MILLISECONDS);
 
             forceUpdateClients();
 
@@ -55,7 +60,9 @@ public class TimedRegionProperties extends RegionProperties {
     }
 
     public void destroy() {
-        Bukkit.getScheduler().cancelTask(task);
+        if (task != null) {
+            task.cancel();
+        }
         forceUpdateClients();
     }
 
