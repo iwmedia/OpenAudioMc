@@ -30,6 +30,7 @@ import org.bukkit.entity.Player;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.TimeUnit;
 
 @NoArgsConstructor
 public class SpeakerService extends Service {
@@ -82,7 +83,7 @@ public class SpeakerService extends Service {
 
             OpenAudioLogger.info("Starting redstone speaker tick task with interval " + interval + " ticks");
 
-            Bukkit.getScheduler().scheduleAsyncRepeatingTask(OpenAudioMcSpigot.getInstance(), () -> {
+            Bukkit.getAsyncScheduler().runAtFixedRate(OpenAudioMcSpigot.getInstance(), task -> {
                 for (Speaker speaker : speakerMap.values()) {
                     // does this speaker have a redstone trigger?
                     if (!ExtraSpeakerOptions.REQUIRES_REDSTONE.isEnabledFor(speaker)) return;
@@ -119,7 +120,7 @@ public class SpeakerService extends Service {
                         }
                     }
                 }
-            }, interval, interval);
+            }, interval * 50L, interval * 50L, TimeUnit.MILLISECONDS);
         } else {
             OpenAudioLogger.info("Redstone speaker tick task is disabled");
         }

@@ -1,7 +1,6 @@
 plugins {
     id 'java-library'
-    id 'com.github.johnrengelman.shadow'
-    id("io.freefair.lombok") version "8.13.1"
+    id("com.gradleup.shadow") version "9.0.0-rc1"
 }
 
 description = 'OpenAudioMc Skywars Integration'
@@ -13,8 +12,11 @@ repositories {
 dependencies {
     compileOnly project(':OpenAudioMc:API')
     compileOnly project(':OpenAudioMc:Plugin')
-    compileOnly deps.spigot
+    compileOnly deps.folia
     compileOnly 'net.gcnt:skywarsreloaded:5.6.1'
+
+    compileOnly deps.lombok.compileOnly
+    annotationProcessor deps.lombok.annotationProcessor
 }
 
 shadowJar {

@@ -11,13 +11,15 @@ import com.craftmend.openaudiomc.spigot.modules.speakers.SpeakerService;
 import com.craftmend.openaudiomc.spigot.modules.speakers.objects.MappedLocation;
 import com.craftmend.openaudiomc.spigot.modules.speakers.objects.Speaker;
 import com.craftmend.openaudiomc.spigot.modules.speakers.utils.SpeakerUtils;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.scheduler.BukkitRunnable;
 
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-public class SpeakerGarbageCollection extends BukkitRunnable {
+public class SpeakerGarbageCollection implements Runnable {
 
     private SpeakerService speakerService;
     private static int PROCESSED_SPEAKERS = 0;
@@ -27,13 +29,16 @@ public class SpeakerGarbageCollection extends BukkitRunnable {
 
     public SpeakerGarbageCollection(SpeakerService speakerService) {
         this.speakerService = speakerService;
-        runTaskTimer(OpenAudioMcSpigot.getInstance(), 600, 600);
-        OpenAudioMc.resolveDependency(TaskService.class).scheduleAsyncRepeatingTask(() -> {
+        Bukkit.getGlobalRegionScheduler().runAtFixedRate(OpenAudioMcSpigot.getInstance(), scheduledTask -> {
+            this.run();
+        }, 600, 600);
+
+        Bukkit.getAsyncScheduler().runAtFixedRate(OpenAudioMcSpigot.getInstance(), task -> {
             if (PROCESSED_SPEAKERS != 0) {
                 OpenAudioLogger.info("The garbage collector found and processed " + PROCESSED_SPEAKERS + " broken speakers");
                 PROCESSED_SPEAKERS = 0;
             }
-        }, 20 * 30, 20 * 30);
+        }, 20 * 30 *50, 20 * 30 * 50, TimeUnit.MILLISECONDS);
     }
 
     public SpeakerGarbageCollection() {
@@ -100,7 +105,7 @@ public class SpeakerGarbageCollection extends BukkitRunnable {
                     .getRepository(Speaker.class)
                     .delete(speaker);
         }
-        OpenAudioMc.resolveDependency(TaskService.class).runAsync(() -> {
+        Bukkit.getAsyncScheduler().runNow(OpenAudioMcSpigot.getInstance(), task -> {
             speakerService.getSpeakerMap().remove(speaker.getLocation());
         });
         PROCESSED_SPEAKERS++;

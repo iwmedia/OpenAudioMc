@@ -4,14 +4,16 @@ import com.craftmend.openaudiomc.spigot.OpenAudioMcSpigot;
 import com.craftmend.openaudiomc.spigot.modules.show.objects.Show;
 import com.craftmend.openaudiomc.spigot.services.clicklib.Item;
 import com.craftmend.openaudiomc.spigot.services.clicklib.menu.Menu;
+import io.papermc.paper.threadedregions.scheduler.ScheduledTask;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
+import org.jetbrains.annotations.Nullable;
 
 public class ShowHomeMenu extends Menu {
 
-    private int scheduler = 0;
+    private @Nullable ScheduledTask scheduler;
     private boolean canceled = false;
 
     public ShowHomeMenu(Show show, Player player) {
@@ -19,14 +21,14 @@ public class ShowHomeMenu extends Menu {
 
         fillout(show, player);
 
-        scheduler = Bukkit.getServer().getScheduler().scheduleSyncRepeatingTask(OpenAudioMcSpigot.getInstance(), () -> {
+        scheduler = player.getScheduler().runAtFixedRate(OpenAudioMcSpigot.getInstance(), task -> {
             if  (!player.isOnline() || canceled) {
                 onClose(player);
                 return;
             }
             fillout(show, player);
             player.updateInventory();
-        }, 1, 1);
+        }, null, 1, 1);
 
         openFor(player);
     }
@@ -34,7 +36,9 @@ public class ShowHomeMenu extends Menu {
     @Override
     public void onClose(Player player) {
         canceled = true;
-        Bukkit.getScheduler().cancelTask(scheduler);
+        if (scheduler != null) {
+            scheduler.cancel();
+        }
     }
 
     private void fillout(Show show, Player player) {

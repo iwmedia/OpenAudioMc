@@ -1,7 +1,6 @@
 plugins {
     id 'java-library'
-    id 'com.github.johnrengelman.shadow'
-    id("io.freefair.lombok") version "8.13.1"
+    id("com.gradleup.shadow") version "9.0.0-rc1"
     id 'application'
 }
 
@@ -15,11 +14,14 @@ dependencies {
     implementation project(':OpenAudioMc:API')
     implementation project(':OpenAudioMc:Plugin')
     implementation project(':OpenAudioMc:OA-VistasClient')
-    implementation deps.spigot
+    implementation deps.folia
     implementation 'com.coreoz:wisp:2.4.0'
     implementation 'com.google.code.gson:gson:2.8.9'
 
     testImplementation 'junit:junit:4.13.2'
+
+    compileOnly deps.lombok.compileOnly
+    annotationProcessor deps.lombok.annotationProcessor
 }
 
 shadowJar {

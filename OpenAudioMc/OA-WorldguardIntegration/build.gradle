@@ -10,7 +10,7 @@ repositories {
 }
 
 dependencies {
-    compileOnly deps.spigot
+    compileOnly deps.folia
 }
 
 test {
