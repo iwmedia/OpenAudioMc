@@ -11,18 +11,24 @@ commands:
   audio:
     aliases: [sound, connect, media, muziek, geluid, vc, voicechat, voice]
     description: Generate a link to the audio web client
+    permission: openaudiomc.commands.audio
   channel:
     aliases: [ch, vch, voicechannel]
     description: Manage/join voice channels
+    permission: openaudiomc.commands.channel
   volume:
     aliases: [setvolume, vol]
     description: Change the volume of the audio web client
+    permission: openaudiomc.commands.volume
   openaudiomc:
     aliases: [oam, oa, openaudio, oams, oas, openaudiospigot]
     description: The command that does all of the magic
+    permission: openaudiomc.commands.openaudiomc
   mutemic:
     aliases: [mm, micmute]
     description: Mute your microphone when using the voice chat system
+    permission: openaudiomc.commands.mutemic
   deafen:
     aliases: [deaf, deafen, undeaf, undeafen]
     description: Deafen yourself when using the voice chat system
+    permission: openaudiomc.commands.deafen
