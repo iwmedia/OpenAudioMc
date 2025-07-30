@@ -33,7 +33,7 @@ public class BungeeAudioCommand extends Command {
     };
 
     public BungeeAudioCommand() {
-        super("audio", null, "sound", "connect", "media", "muziek", "geluid", "vc", "voicechat", "voice");
+        super("audio", "openaudiomc.commands.audio", "sound", "connect", "media", "muziek", "geluid", "vc", "voicechat", "voice");
     }
 
     @Override

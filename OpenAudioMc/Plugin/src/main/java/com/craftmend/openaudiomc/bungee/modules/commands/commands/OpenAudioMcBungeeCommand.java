@@ -17,7 +17,7 @@ public class OpenAudioMcBungeeCommand extends Command {
 
 
     public OpenAudioMcBungeeCommand() {
-        super("openaudiomc", null, "oam", "oa", "openaudio");
+        super("openaudiomc", "openaudiomc.commands.openaudiomc", "oam", "oa", "openaudio");
     }
 
     /**

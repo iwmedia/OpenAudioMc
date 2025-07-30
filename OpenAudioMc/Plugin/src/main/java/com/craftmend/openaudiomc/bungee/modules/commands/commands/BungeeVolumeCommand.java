@@ -27,7 +27,7 @@ public class BungeeVolumeCommand extends Command {
     };
 
     public BungeeVolumeCommand() {
-        super("volume", null, "setvolume", "vol");
+        super("volume", "openaudiomc.commands.volume", "setvolume", "vol");
     }
 
     /**
