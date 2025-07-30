@@ -46,7 +46,7 @@ public class AuthenticationService extends Service {
         registrationProvider = new RestRequest(RegistrationResponse.class, Endpoint.REGISTER);
 
         // add provisioning key, if we have it, look for it in the launch properties
-        String provisioningKey = System.getProperty("openaudio.provisioningKey");
+        String provisioningKey = System.getenv("OPENAUDIO_PROVISIONING_KEY");
         if (provisioningKey != null) {
             registrationProvider.setQuery("provisioningKey", provisioningKey);
         }
